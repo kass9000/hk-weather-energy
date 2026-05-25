@@ -1,0 +1,30 @@
+name: 每日自動更新氣溫數據
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每日香港時間早上10時（UTC+8 = UTC 02:00）
+  workflow_dispatch:       # 亦可手動觸發
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 下載 Repository
+        uses: actions/checkout@v4
+
+      - name: 安裝 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安裝依賴
+        run: pip install requests pandas
+
+      - name: 執行更新腳本
+        run: python update_data.py
+
+      - name: 上傳更新後嘅檔案
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 自動更新：每日氣溫數據"
+          file_pattern: index.html
